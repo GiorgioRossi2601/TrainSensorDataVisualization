@@ -112,7 +112,7 @@ services:
       - trains_network  # Connect the consumer to the custom Docker network
     entrypoint: ["/wait-for-it.sh", "kafka:9092", "--", "sh", "-c", "python consumer_synthetic_data.py"]  # Wait for Kafka before running the script
 
-  # Producer and Consumer pairs for second vehicles
+  # Producer and Consumer pairs for the second vehicles
   # Producer2
   producer_2:
     build:
@@ -143,7 +143,7 @@ services:
       - trains_network
     entrypoint: ["/wait-for-it.sh", "kafka:9092", "--", "sh", "-c", "python consumer_synthetic_data.py"]
 
-  # Producer and Consumer pairs for third vehicles
+  # Producer and Consumer pairs for the third vehicles
   # Producer3
   producer_3:
     build:
@@ -152,7 +152,7 @@ services:
     hostname: producer_3
     environment:
       KAFKA_BROKER: 'kafka:9092'
-      VEHICLE_NAME: 'e700_4803'  # Name of the second vehicle
+      VEHICLE_NAME: 'e700_4803'  # Name of the third vehicle
     depends_on:
       - kafka
     networks:
@@ -167,7 +167,7 @@ services:
     hostname: consumer_3
     environment:
       KAFKA_BROKER: 'kafka:9092'
-      VEHICLE_NAME: 'e700_4803'  # Name of the second vehicle
+      VEHICLE_NAME: 'e700_4803'  # Name of the third vehicle
     depends_on:
       - kafka
     networks:
