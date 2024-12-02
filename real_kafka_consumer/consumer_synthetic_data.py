@@ -127,11 +127,11 @@ def process_message(topic, msg, producer):
 
     logging.info(f"Processing message from topic [{topic}]")
     if topic.endswith("_anomalies"):
-        logging.info(f"ANOMALIES - Processing message")
+        logging.info(f"ANOMALIES ({topic}) - Processing message")
         anomalies_msg_list.append(msg)
         received_anomalies_msg += 1
     elif topic.endswith("_normal_data"):
-        logging.info(f"NORMAL DATA - Processing message")
+        logging.info(f"NORMAL DATA ({topic}) - Processing message")
         normal_msg_list.append(msg)
         received_normal_msg += 1
 
