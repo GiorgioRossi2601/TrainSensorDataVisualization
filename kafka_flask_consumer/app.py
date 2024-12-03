@@ -18,6 +18,9 @@ KAFKA_BROKER = os.getenv('KAFKA_BROKER', 'kafka:9092')  # Kafka broker URL
 TOPIC_NAME = os.getenv('TOPIC_NAME', 'train-sensor-data')  # Kafka topic name
 VEHICLE_NAME=os.getenv('VEHICLE_NAME', 'e700_4801')
 
+topic_anomalies='^.*_anomalies$'
+topic_normal_data='^.*_normal_data$'
+
 # Validate that KAFKA_BROKER and TOPIC_NAME are set
 if not KAFKA_BROKER:
     raise ValueError("Environment variable KAFKA_BROKER is missing.")
@@ -77,7 +80,7 @@ def kafka_consumer_thread():
     and appends them to the global simulate_msg_list or real_msg_list based on the message structure.
     """
     consumer = Consumer(conf_cons)
-    consumer.subscribe([TOPIC_NAME, f"{VEHICLE_NAME}_anomalies", f"{VEHICLE_NAME}_normal_data"])
+    consumer.subscribe([TOPIC_NAME, topic_anomalies, topic_normal_data])
     global simulate_msg_list, real_msg_list, anomalies_msg_list, normal_msg_list, received_all_real_msg, received_anomalies_msg, received_normal_msg
     try:
         while True:
@@ -95,38 +98,32 @@ def kafka_consumer_thread():
             deserialized_data = deserialize_message(msg)
             if deserialized_data:
                 logging.info(f"Received message from topic {msg.topic()}: {deserialized_data}")
-                if msg.topic() == f"{VEHICLE_NAME}_anomalies":
-                    logging.info(f"ANOMALIES - Deserialized message: {deserialized_data}")
+                if msg.topic().endswith("_anomalies"):
+                    logging.info(f"ANOMALIES ({msg.topic()}) - Deserialized message: {deserialized_data}")
                     anomalies_msg_list.append(deserialized_data)
                     anomalies_msg_list = anomalies_msg_list[-MAX_MESSAGES:]  # Keep only the last MAX_MESSAGES
                     real_msg_list.append(deserialized_data)
                     real_msg_list = real_msg_list[-MAX_MESSAGES:]  # Keep only the last MAX_MESSAGES
 
-                    received_all_real_msg += 1
-                    received_anomalies_msg += 1
+                    print(f"DATA ({msg.topic()}) - {deserialized_data}")
 
-                    print(f"DATA - {deserialized_data}")
-
-                elif msg.topic() == f"{VEHICLE_NAME}_normal_data":
-                    logging.info(f"NORMAL DATA - Deserialized message: {deserialized_data}")
+                elif msg.topic().endswith("_normal_data"):
+                    logging.info(f"NORMAL DATA ({msg.topic()}) - Deserialized message: {deserialized_data}")
                     normal_msg_list.append(deserialized_data)
                     normal_msg_list = normal_msg_list[-MAX_MESSAGES:]  # Keep only the last MAX_MESSAGES
                     real_msg_list.append(deserialized_data)
                     real_msg_list = real_msg_list[-MAX_MESSAGES:]  # Keep only the last MAX_MESSAGES
 
-                    received_all_real_msg += 1
-                    received_normal_msg += 1
-
                     print(f"DATA - {deserialized_data}")
 
                 elif len(deserialized_data.keys()) == 5:
                     # If the message has 5 keys, treat it as simulated data
-                    logging.info(f"5K - Deserialized message: {deserialized_data}")
+                    logging.info(f"5K ({msg.topic()}) - Deserialized message: {deserialized_data}")
                     simulate_msg_list.append(deserialized_data)
                     simulate_msg_list = simulate_msg_list[-MAX_MESSAGES:]  # Keep only the last MAX_MESSAGES
                 else:
                     # Otherwise, treat it as real sensor data
-                    logging.info(f"RK - Deserialized message: {deserialized_data}")
+                    logging.info(f"RK ({msg.topic()}) - Deserialized message: {deserialized_data}")
                     real_msg_list.append(deserialized_data)
                     real_msg_list = real_msg_list[-MAX_MESSAGES:]  # Keep only the last MAX_MESSAGES
             else:
