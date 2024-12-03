@@ -155,7 +155,7 @@ def main():
     parser.add_argument('--mu_normal', type=float, default=115, help='Mu parameter (mean of the mean interarrival times of normal data)')
     parser.add_argument('--alpha', type=float, default=0.2, help='Alpha parameter (scaling factor of the mean interarrival times of both anomalies and normal data)')
     parser.add_argument('--beta', type=float, default=1.9, help='Beta parameter (std dev of interarrival times of both anomalies and normal data)')
-    #parser.add_argument('--vehicle_name', type=str, default='e700_4801', help='Comma-separated list of vehicle names')
+    parser.add_argument('--vehicle_name', type=str, default='e700_4801', help='Comma-separated list of vehicle names')
 
     args = parser.parse_args()
 
@@ -169,7 +169,7 @@ def main():
         mu_normal=args.mu_normal,
         alpha=args.alpha,
         beta=args.beta,
-        #vehicle_name=VEHICLE_NAME
+        vehicle_name=VEHICLE_NAME
     )
 
     thread1 = threading.Thread(target=thread_anomalie, args=(vehicle_args,))
