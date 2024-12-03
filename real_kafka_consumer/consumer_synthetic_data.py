@@ -56,14 +56,15 @@ received_all_real_msg = 0 # Total number of messages received
 received_anomalies_msg = 0 # Number of anomaly messages received
 received_normal_msg = 0 # Number of normal data messages received
 
-# Dictionary to store statistics
-stats = {
-    'vehicle_name' : VEHICLE_NAME, # Name of the vehicle
-    'total_messages': received_all_real_msg, # Total number of messages
-    'anomalies_messages': received_anomalies_msg, # Total number of anomaly messages
-    'normal_messages': received_normal_msg # Total number of normal data messages
-}
-
+def update_statistics(received_all_real_msg, received_anomalies_msg, received_normal_msg):
+    # Dictionary to store statistics
+    stats = {
+        'vehicle_name': VEHICLE_NAME,  # Name of the vehicle
+        'total_messages': received_all_real_msg,  # Total number of messages
+        'anomalies_messages': received_anomalies_msg,  # Total number of anomaly messages
+        'normal_messages': received_normal_msg  # Total number of normal data messages
+    }
+    return stats
 
 # Kafka consumer configuration
 def create_consumer():
@@ -127,7 +128,6 @@ def check_and_create_topics(topic_list):
             except KafkaException as e:
                 logging.error(f"Failed to create topic '{topic}': {e}")
 
-
 def produce_statistics(producer):
     """
     Publish the current statistics to the Kafka statistics topic.
@@ -136,6 +136,7 @@ def produce_statistics(producer):
         producer (Producer): The Kafka producer instance for publishing statistics.
     """
     global received_all_real_msg, received_anomalies_msg, received_normal_msg
+    stats = update_statistics(received_all_real_msg,received_anomalies_msg, received_normal_msg)
     topic_statistics=f"{VEHICLE_NAME}_statistics" #  Define the statistics topic
     try:
         # Send statistics to the Kafka topic
