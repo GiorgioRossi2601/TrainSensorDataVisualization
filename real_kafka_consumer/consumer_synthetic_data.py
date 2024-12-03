@@ -142,7 +142,7 @@ def produce_statistics(producer):
         # Send statistics to the Kafka topic
         producer.produce(topic=topic_statistics, value=stats) # Publish statistics to Kafka
         producer.flush() # Ensure all messages are sent
-        logging.info(f"Statistics published to topic: {topic_statistics}")
+        logging.info(f"Statistics published to topic {topic_statistics}: {stats}")
     except Exception as e:
         logging.error(f"Failed to produce statistics: {e}")
 
